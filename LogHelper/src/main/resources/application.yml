@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: LogHelper
+
+log-helper:
+  enabled: true
+  jwt-secret: gyo5201314
+  mongo-collection: log_helper
+  host: 127.0.0.1
+  port: 27017
+  username: root
+#  password:
+  exclude-paths: /health,/actuator/**
