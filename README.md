@@ -1,5 +1,6 @@
 # LogHelper
-# 日志助手
+**日志助手**
+
 **Implementing log management with an annotation**
 
 **一个注解实现日志统一管理**
@@ -137,3 +138,20 @@
 		        return userInfo;
 		    }
 		}
+
+
+**After completing the above steps, log management can be achieved**
+
+**完成上述步骤后，即可实现日志管理**
+
+Use the `db.logs.find()` command in MongoDB to query relevant logs.
+
+在MongoDB中使用db.logs.find()命令可查询到相关日志。
+
+**Attachment: Installation and Use of Spring Boot and MongoDB**
+
+**附：Spring Boot 和 MongoDB 的安装与使用**
+
+* [Spring Boot Home](https://spring.io/ "Spring Boot官网地址") 
+* [MongoDB Community Download](https://www.mongodb.com/try/download/community "MongoDB数据库社区版中文下载连接")
+
