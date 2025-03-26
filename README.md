@@ -24,11 +24,14 @@
 
 	日志的统一存储。将收集到的日志写入MongoDB数据库。
 
+* The asynchronous writing of logs and integrate RabbitMQ to support message queuing.
+	
+	支持日志的异步写入，并整合RabbitMQ支持消息排队。
+
+	（据测试，开启异步写入能够提高接口响应时间的43.85%。）
+
 	......
 
-* In the next version, I will complete the asynchronous writing of logs and integrate other middleware to support message queuing.
-	
-	下个版本我将完成日志的异步写入，并整合其他中间件支持消息排队。
 
 * Perhaps a panel for displaying logs is also important.
  
@@ -64,6 +67,13 @@
 		  username: root
 		  password: xxxx
 		  exclude-paths: /health,/actuator/**
+		  <!--关于rabbitmq的配置-->
+		  ramq-enabled: true //是否开启基于rabbitmq的异步写入功能
+		  ramq-host: localhost //rabbitmq的IP
+		  ramq-port: 5672 //rabbitmq的端口
+		  ramq-username: admin //rabbitmq的用户
+		  ramq=password: admin //rabbitmq的密码
+		  ramq-virtual-host: /
 
 
 - [3] Due to the fact that the logging business is implemented based on AOP, it is necessary to enable support for AOP programming in the startup class.
@@ -150,8 +160,9 @@ Use the `db.logs.find()` command in MongoDB to query relevant logs.
 
 **Attachment: Installation and Use of Spring Boot and MongoDB**
 
-**附：Spring Boot 和 MongoDB 的安装与使用**
+**附：Spring Boot 、 MongoDB 、RabbitMQ 的安装与使用**
 
 * [Spring Boot Home](https://spring.io/ "Spring Boot官网地址") 
 * [MongoDB Community Download](https://www.mongodb.com/try/download/community "MongoDB数据库社区版中文下载连接")
+* [RabbitMQ](https://www.rabbitmq.com/ "RabbitMQ 官网地址") 
 
