@@ -4,8 +4,13 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.rabbitmq.client.ConnectionFactory;
+import lombok.Data;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,6 +20,7 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "log-helper")
 @Primary
+@Data
 public class LogHelperProperties {
     private boolean enabled;
     private String jwtSecret;
@@ -24,7 +30,12 @@ public class LogHelperProperties {
     private String username;
     private String password;
     private List<String> excludePaths;
-
+    private boolean ramqEnabled;
+    private String ramqHost;
+    private int ramqPort;
+    private String ramqUsername;
+    private String ramqPassword;
+    private String ramqVirtualHost;
     @Bean
     public MongoClient mongoClient() {
         String connectionString;
@@ -48,67 +59,21 @@ public class LogHelperProperties {
         return new MongoTemplate(mongoClient(), mongoCollection);
     }
 
-    // 生成 Getters 和 Setters
-    public void setMongoCollection(String mongoCollection) {
-        this.mongoCollection = mongoCollection;
-    }
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getJwtSecret() {
-        return jwtSecret;
+    @Bean
+    @Conditional(RabbitMQEnabledCondition.class)
+    public CachingConnectionFactory  connectionFactory() {
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+        connectionFactory.setHost(this.ramqHost);
+        connectionFactory.setUsername(this.ramqUsername);
+        connectionFactory.setPassword(this.ramqPassword);
+        connectionFactory.setPort(this.ramqPort);
+        connectionFactory.setVirtualHost(this.ramqVirtualHost);
+        return connectionFactory;
     }
 
-    public void setJwtSecret(String jwtSecret) {
-        this.jwtSecret = jwtSecret;
-    }
-
-    public String getMongoCollection() {
-        return mongoCollection;
-    }
-
-    public List<String> getExcludePaths() {
-        return excludePaths;
-    }
-
-    public void setExcludePaths(List<String> excludePaths) {
-        this.excludePaths = excludePaths;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    @Bean
+    @Conditional(RabbitMQEnabledCondition.class)
+    public RabbitTemplate rabbitTemplate(CachingConnectionFactory  connectionFactory) {
+        return new RabbitTemplate(connectionFactory);
     }
 }

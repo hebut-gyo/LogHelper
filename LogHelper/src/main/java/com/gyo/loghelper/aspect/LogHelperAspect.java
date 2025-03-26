@@ -3,6 +3,7 @@ package com.gyo.loghelper.aspect;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gyo.loghelper.config.LogHelperProperties;
+import com.gyo.loghelper.config.RabbitMQEnabledCondition;
 import com.gyo.loghelper.entity.Log;
 import com.gyo.loghelper.util.JwtParser;
 import io.jsonwebtoken.Claims;
@@ -18,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
@@ -32,14 +34,16 @@ import java.util.Map;
 @Aspect
 public class LogHelperAspect {
     private final MongoTemplate mongoTemplate;
+    private final RabbitTemplate rabbitTemplate;
     private final LogHelperProperties properties;
     private final ObjectProvider<HttpServletRequest> requestProvider;
 
     private final JwtParser jwtParser;  // 使用接口，而不是固定实现
-    public LogHelperAspect(LogHelperProperties properties,MongoTemplate mongoTemplate,
+    public LogHelperAspect(LogHelperProperties properties,MongoTemplate mongoTemplate,RabbitTemplate rabbitTemplate,
                            ObjectProvider<HttpServletRequest> requestProvider,JwtParser jwtParser) {
         this.properties = properties;
         this.mongoTemplate = mongoTemplate;
+        this.rabbitTemplate = rabbitTemplate;
         this.requestProvider = requestProvider;
         this.jwtParser = jwtParser;
     }
@@ -95,7 +99,13 @@ public class LogHelperAspect {
             log.setResponseResult("Error: " + e.getMessage());
             throw e;
         } finally {
-            mongoTemplate.save(log,"logs");
+            if(!properties.isRamqEnabled()) {
+                mongoTemplate.save(log,"logs");
+                System.out.println("同步写入");
+            }
+            else{
+                rabbitTemplate.convertAndSend("log-helper",log);
+            }
         }
 
         return result;

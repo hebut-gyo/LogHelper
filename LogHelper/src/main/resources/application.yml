@@ -1,7 +1,6 @@
 spring:
   application:
     name: LogHelper
-
 log-helper:
   enabled: true
   jwt-secret: gyo5201314
@@ -11,3 +10,11 @@ log-helper:
   username: root
 #  password:
   exclude-paths: /health,/actuator/**
+  ramq-enabled: true
+  ramq-host: localhost
+  ramq-port: 5672
+  ramq-username: admin
+  ramq=password: admin
+  ramq-virtual-host: /
+server:
+  port: 8080

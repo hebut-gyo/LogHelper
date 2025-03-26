@@ -3,12 +3,14 @@ package com.gyo.loghelper.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Map;
 
 @Document(collection = "logs")
-public class Log {
+public class Log implements Serializable {
+        private static final long serialVersionUID = 1L;
         @Id
         private String id;
         private String interfaceName; // 接口名

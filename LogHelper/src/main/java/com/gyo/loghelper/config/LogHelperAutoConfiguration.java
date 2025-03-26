@@ -2,6 +2,7 @@ package com.gyo.loghelper.config;
 
 import com.gyo.loghelper.aspect.LogHelperAspect;
 import com.gyo.loghelper.util.JwtParser;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,9 +18,10 @@ public class LogHelperAutoConfiguration {
     @Bean
     public LogHelperAspect logHelperAspect(LogHelperProperties properties,
                                            MongoTemplate mongoTemplate,
+                                           RabbitTemplate rabbitTemplate,
                                            ObjectProvider<HttpServletRequest> requestProvider,
                                            JwtParser jwtParser){
-        return new LogHelperAspect(properties, mongoTemplate,requestProvider,jwtParser);
+        return new LogHelperAspect(properties, mongoTemplate,rabbitTemplate,requestProvider,jwtParser);
     }
 
     @Bean
